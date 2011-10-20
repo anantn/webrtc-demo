@@ -3,6 +3,8 @@ var express = require('express');
 var app = express.createServer(express.logger());
 app.use(express.static(__dirname + '/static'));
 app.use(express.bodyParser());
+app.register('.html',require('jqtpl').express);
+app.set('view options',{layout:false});
 
 var messages = {
 };
@@ -65,6 +67,17 @@ app.post('/reset', function(request, response) {
 	     
 	     response.send("OK");
 });
+
+app.get('/', function(request, response) {
+	    var params = {};
+	    if (!request.query['svn']){
+		params.script_url = "/static/js";
+	    }
+	    else {
+		params.script_url = "http://svn.resiprocate.org/rep/ietf-drafts/fluffy";
+	    }
+	    response.render("demo.html", params);
+	});
 
 
 var port = process.env.PORT || 3000;
