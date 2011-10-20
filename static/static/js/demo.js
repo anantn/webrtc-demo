@@ -6,8 +6,9 @@ var ui_log = function(msg) {
     $("#logwindow").append(d);
 };
 
-var ROAPClient = function(username, target) {
-    var poll_timeout = 5000; // ms
+
+var ROAPClient = function(username, peer, start_call) {
+    var poll_timeout = 1000; // ms
     
     var log = function(msg) {
 	console.log("LOG (" + username + "): " + msg);
@@ -15,7 +16,9 @@ var ROAPClient = function(username, target) {
     };
     
     var signaling = function(msg) {
-	msg.dest = target;
+	msg.dest = peer;
+
+	log("Sending: " + JSON.stringify(msg));
 
 	$.ajax({
 		   url : "/msg/",
@@ -46,7 +49,7 @@ var ROAPClient = function(username, target) {
 
     var pc = new PeerConnection({}, signaling);
     
-    if (target) {
+    if (start_call) {
 	pc.addStream();
     }
 
@@ -57,6 +60,6 @@ var ROAPClient = function(username, target) {
 
 
 var ROAPTest = function() {
-    var caller = new ROAPClient("alice", "bob");
-    var callee = new ROAPClient("bob", false);
+    var caller = new ROAPClient("alice", "bob", true);
+    var callee = new ROAPClient("bob", "alice");
 };

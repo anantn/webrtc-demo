@@ -75,6 +75,11 @@ var PeerConnection = function(configuration, signaling) {
 	);
     };
 
+    var process_answer = function(answer) {
+	log("Processing answer " + JSON.stringify(answer));
+
+    };
+
     var addStream = function(mediaStream) {
 	log("Adding stream");
 	if (!offer_waiting) {
@@ -96,6 +101,9 @@ var PeerConnection = function(configuration, signaling) {
     var processSignalingMessage = function(message) {
 	if (message.messageType == "OFFER") {
 	    process_offer(message);
+	}
+	if (message.messageType == "ANSWER") {
+	    process_answer(message);
 	}
     };
 
