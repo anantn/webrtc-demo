@@ -52,7 +52,10 @@ var PeerConnection = function(configuration, signaling) {
     };
     
     var process_offer = function(offer) {
+	log("Processing offer " + JSON.stringify(offer));
+
 	if (caller_session_id === null) {
+	    log("New call: " + offer.callerSessionId);
 	    caller_session_id = offer.callerSessionId;
 	}
 	
@@ -99,6 +102,7 @@ var PeerConnection = function(configuration, signaling) {
 
     return {
 	addStream: addStream,
-	removeStream : removeStream
+	removeStream : removeStream,
+	processSignalingMessage: processSignalingMessage
     };
 };
