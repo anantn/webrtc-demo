@@ -69,13 +69,25 @@ app.post('/reset', function(request, response) {
 });
 
 app.get('/', function(request, response) {
-	    var params = {};
-	    if (!request.query['svn']){
-		params.script_url = "/static/js";
+	    var local_src = "/static/js";
+	    var svn_src = "http://svn.resiprocate.org/rep/ietf-drafts/fluffy/roap_demo";
+	    var params = {
+		peerconnection_src:local_src,
+		test_src:local_src
+	    };
+
+	    console.log(request.query);
+
+	    if (request.query['pc'] === "svn" ){
+		console.log("Using peerconnection from svn");
+		params.peerconnection_src = svn_src;
 	    }
-	    else {
-		params.script_url = "http://svn.resiprocate.org/rep/ietf-drafts/fluffy";
+	    
+	    if (request.query['test'] === "svn"){
+		params.test_src = svn_src;		
 	    }
+	    
+	    console.log(params);
 	    response.render("demo.html", params);
 	});
 
