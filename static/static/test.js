@@ -1,4 +1,10 @@
 var runtests = function() {
+    run_message_bus_tests();
+    run_peer_connection_tests();
+};
+
+var run_message_bus_tests= function() {
+    module("Message Bus");
     var test_message = {
 	dest:'alice',
 	body: {
@@ -91,6 +97,18 @@ var runtests = function() {
 			     }
 			 });
 	      });
+};
+
+
+
+
+var test_ctx = {};
+
+var run_peer_connection_tests= function() {
+
+    module("Peer Connection");
     
-    module("Module A");
+    test("create peerconnection", function() {
+	     text = new PeerConnection();
+	 });
 };

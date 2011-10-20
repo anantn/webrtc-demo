@@ -1,10 +1,18 @@
-PeerConnection = function(configuration, signaling) {
+var PeerConnection = function(configuration, signaling) {
     var offer_waiting = false;
     var streams = [];
     var sequence = 1;
     
     var caller_session_id = undefined;
     var callee_session_id = undefined;
+
+    var log = function(msg) {
+	console.log("PCLOG: " + msg);
+	
+	if(ui_log) {
+	    ui_log("PCLOG: " + msg);
+	}
+    };
 
     var error = function(err) {
 	console.log("ERROR: " + err);
@@ -65,6 +73,7 @@ PeerConnection = function(configuration, signaling) {
     };
 
     var addStream = function(mediaStream) {
+	log("Adding stream");
 	if (!offer_waiting) {
 	    setTimeout(function() {
 			   send_message(make_offer(), "OFFER");
@@ -85,8 +94,6 @@ PeerConnection = function(configuration, signaling) {
 	if (message.messageType == "OFFER") {
 	    process_offer(message);
 	}
-
-
     };
 
 
