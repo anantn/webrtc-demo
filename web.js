@@ -38,21 +38,33 @@ app.get('/msg/:user' + user_re, function(request, response) {
 	    var msg;
 	    var user;
 
-	    console.log('Recv: ' + req.params.user);
-	    user = req.params.user;
+	    console.log('Recv: ' + request.params.user);
+	    user = request.params.user;
 	    
 	    if (!messages[user]) {
 		response.send("No messages", 404);
+		return;
+	    }
+
+	    if (!messages[user].length) {
+		response.send("No messages", 404);
+		return;
 	    }
 
 	    msg = messages[user].pop();
 
-	    console.log("User " + msg['dest'] + " now has " + msg['dest'].length + " messages");
+	    console.log("User " + user + " now has " + messages[user].length + " messages");
 	    
 	    console.log("Returning message " + JSON.stringify(msg));
 
 	    response.send(JSON.stringify(msg));
 	});
+
+app.post('/reset', function(request, response) {
+	     messages = {};
+	     
+	     response.send("OK");
+});
 
 
 var port = process.env.PORT || 3000;
