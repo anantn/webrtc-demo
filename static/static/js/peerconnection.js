@@ -3,8 +3,8 @@ var PeerConnection = function(configuration, signaling) {
     var streams = [];
     var sequence = 1;
     
-    var caller_session_id = undefined;
-    var callee_session_id = undefined;
+    var caller_session_id;
+    var callee_session_id;
 
     var log = function(msg) {
 	console.log("PCLOG: " + msg);
@@ -54,7 +54,7 @@ var PeerConnection = function(configuration, signaling) {
     var process_offer = function(offer) {
 	log("Processing offer " + JSON.stringify(offer));
 
-	if (caller_session_id === null) {
+	if (caller_session_id === undefined) {
 	    log("New call: " + offer.callerSessionId);
 	    caller_session_id = offer.callerSessionId;
 	}
