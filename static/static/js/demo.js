@@ -91,7 +91,7 @@ var CallingClient = function(username, peer, start_call, config_) {
     var addStream = function() {
 	navigator.webkitGetUserMedia('video', function(stream) {
 					 console.log("Got stream");
-					 pc.addStream(stream);
+//					 pc.addStream(stream);
 				     },
 				     function() {
 					 console.log("Couldn't create stream");
@@ -100,6 +100,8 @@ var CallingClient = function(username, peer, start_call, config_) {
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
     
+    console.log("Made PeerConnection");
+
     if (start_call) {
 	pc.addStream(addStream());
     }
