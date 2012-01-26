@@ -7,25 +7,54 @@
 <body>
 <h3>ROAP Test</h3>
 
+<style type="text/css">
+  #local {    
+   width:50%;
+  }
+  #remote {
+    float: right;  
+    width: 50%;
+    left-margin: 50%;
+  }   
+</style>
+
 <div id="logwindow">
 </div>
 
   <div id="local">
     <video
-     width="100%" height="100%" id="localVideo" autoplay="autoplay"
-     onclick="onClick()" style="opacity: 0;
-     -webkit-transition-property: opacity;
-     -webkit-transition-duration: 2s;">
+     width="100%" height="100%" id="localVideo" autoplay="autoplay">
     </video>
   </div>
   <div id="remote">
-    <video width="100%" height="100%" id="remoteVideo" autoplay="autoplay"
-     style="opacity: 0; 
-     -webkit-transition-property: opacity;
-     -webkit-transition-duration: 2s;">
+    <video width="100%" height="100%" id="remoteVideo" autoplay="autoplay">
     </video>
   </div>
 
+	
+  <div id="local">
+    <video
+     width="100%" height="100%" id="localVideo2" autoplay="autoplay">
+    </video>
+  </div>
+  <div id="remote">
+    <video width="100%" height="100%" id="remoteVideo2" autoplay="autoplay">
+    </video>
+  </div>
+
+
+	
+
+   <script>
+    function WebRTCDemo(me, them, start) {
+       var video = {};
+       
+       video.local = document.getElementById("localVideo");
+       video.remote = document.getElementById("remoteVideo");
+
+       new CallingClient(default_config, me, them, video, start);
+     }
+   </script>
 
 </body>
 </html>

@@ -41,12 +41,14 @@ var ajax = function(params) {
 };
 
 
-var CallingClient = function(username, peer, start_call, config_) {
+var CallingClient = function(config_, username, peer, video_, start_call) {
     console.log("Calling client constructor");
-    var poll_timeout = 1000; // ms
+    var poll_timeout = 5000; // ms
     
     var config = $.extend({}, config_);
-
+    var video = $.extend({}, video_);
+    var state = "INIT";
+    
     if (!config.stun) {
 	console.log("Need to provide STUN server");
 	return;
@@ -54,13 +56,18 @@ var CallingClient = function(username, peer, start_call, config_) {
 
     var log = function(msg) {
 	console.log("LOG (" + username + "): " + msg);
-	ui_log("LOG (" + username + "): " + msg);
+//	ui_log("LOG (" + username + "): " + msg);
     };
-    
-    var signaling = function(msg) {
-	msg.dest = peer;
 
-	log("Sending: " + JSON.stringify(msg));
+    // Signaling methods    
+    var signaling = function(msg_) {
+	var msg = {
+	    dest:peer,
+	    body:msg_
+	};
+
+//	log("Sending: " + JSON.stringify(msg));
+	log("Sending");
 
 	ajax({
 		 url : "/msg/",
@@ -72,9 +79,13 @@ var CallingClient = function(username, peer, start_call, config_) {
 
     var poll_success = function(msg) {
 	var js = JSON.parse(msg);
-	log("Received message " + JSON.stringify(js));
+//	log("Received message " + JSON.stringify(js));
+	log("Received message");
 	
-	pc.processSignalingMessage(js);
+	if (state == "INIT")
+	    addStream();
+
+	pc.processSignalingMessage(js.body);
     };
         
     var poll_error = function(msg) {
@@ -89,8 +100,18 @@ var CallingClient = function(username, peer, start_call, config_) {
 	     });
     };
 
-    var mediasuccess = function(x) {
-	 console.log("Got stream");
+    // Media processing
+    var mediasuccess = function(stream) {
+	log("Got stream");
+	pc.addStream(stream);
+	state = "STARTED";
+
+	// Set video
+	var url = webkitURL.createObjectURL(stream);
+	if (video) {
+	    video.local.style.opacity = 1;
+	    video.local.src = webkitURL.createObjectURL(stream);
+	};
     };
 
     var mediafailure = function() {
@@ -98,14 +119,40 @@ var CallingClient = function(username, peer, start_call, config_) {
     };
     var addStream = function() {
 	try {
-	    navigator.webkitGetUserMedia("video, audio", mediasuccess, mediafailure);
+	    navigator.webkitGetUserMedia( video ? "video, audio" : "video",
+					  mediasuccess, mediafailure);
 	} catch (x) {
 	    console.log("Couldn't get media stream: "+ x);
 	}
     };
+    
+
+    var onAddStream = function(stream) {
+	log("onAddStream()");
+    };
+
+    var onConnecting = function() {
+	log("onConnecting()");
+    };
+
+    var onMessage = function() {
+	log("onMessage()");
+    };
+    var onOpen = function() {
+	log("onOpen()");
+    };
+    var onRemoveStream = function() {
+	log("onRemoveStream()");
+    };
+    
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
-    
+    pc.onaddstream = onAddStream;
+    pc.onconnecting = onConnecting;
+    pc.onmessage = onMessage;
+    pc.onopen = onOpen;
+    pc.onremovestream = onRemoveStream;
+
     console.log("Made PeerConnection");
 
     if (start_call) {
@@ -117,8 +164,8 @@ var CallingClient = function(username, peer, start_call, config_) {
 };
 
 
-config = {
+default_config = {
     stun:'stun.l.google.com:19302'
 };
 
-new CallingClient("abc", "def", true, config);
+//new CallingClient(config, "abc", "def", video, true);
