@@ -101,7 +101,7 @@ var CallingClient = function(username, peer, start_call, config_) {
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
     
     if (start_call) {
-	pc.addStream(new );
+	pc.addStream(addStream());
     }
 
     // Start polling
