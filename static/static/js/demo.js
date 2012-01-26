@@ -43,7 +43,7 @@ var ajax = function(params) {
 
 var CallingClient = function(config_, username, peer, video_, start_call) {
     console.log("Calling client constructor");
-    var poll_timeout = 5000; // ms
+    var poll_timeout = 500; // ms
     
     var config = $.extend({}, config_);
     var video = $.extend({}, video_);
@@ -129,6 +129,13 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 
     var onAddStream = function(stream) {
 	log("onAddStream()");
+	// Set video
+	var url = webkitURL.createObjectURL(stream);
+	if (video) {
+	    video.remote.style.opacity = 1;
+	    video.remote.src = webkitURL.createObjectURL(stream);
+	};
+	
     };
 
     var onConnecting = function() {
