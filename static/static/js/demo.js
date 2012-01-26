@@ -41,7 +41,7 @@ var ajax = function(params) {
 };
 
 
-var ROAPClient = function(username, peer, start_call) {
+var CallingClient = function(username, peer, start_call) {
     var poll_timeout = 1000; // ms
     
     var log = function(msg) {
@@ -81,7 +81,7 @@ var ROAPClient = function(username, peer, start_call) {
 	     });
     };
 
-    var pc = new PeerConnection({}, signaling);
+    var pc = new webkitPeerConnection({}, signaling);
     
     if (start_call) {
 	pc.addStream();
@@ -91,9 +91,3 @@ var ROAPClient = function(username, peer, start_call) {
     poll();
 };
 
-
-
-var ROAPTest = function() {
-    var caller = new ROAPClient("alice", "bob", true);
-    var callee = new ROAPClient("bob", "alice");
-};
