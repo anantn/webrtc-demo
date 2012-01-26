@@ -90,13 +90,18 @@ var CallingClient = function(username, peer, start_call, config_) {
     };
 
     var addStream = function() {
-	navigator.webkitGetUserMedia('audio', function(stream) {
-					 console.log("Got stream");
-//					 pc.addStream(stream);
-				     },
-				     function() {
-					 console.log("Couldn't create stream");
-				     });
+	try {
+	    navigator.webkitGetUserMedia('audio', function(stream) {
+					     console.log("Got stream");
+					     //					 pc.addStream(stream);
+					 },
+					 function() {
+					     console.log("Couldn't create stream");
+					 });
+	} catch (x) {
+	    console.log("Couldn't get media stream');
+	}
+	
     };
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
