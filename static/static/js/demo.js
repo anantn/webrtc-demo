@@ -133,7 +133,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	// Set video
 	if (video) {
 	    video.remote.style.opacity = 1;
-	    video.local.src = webkitURL.createObjectURL(ev.stream);
+	    video.remote.src = webkitURL.createObjectURL(ev.stream);
 	};
 	
     };
