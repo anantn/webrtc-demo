@@ -109,7 +109,7 @@ var CallingClient = function(username, peer, start_call, config_) {
     console.log("Made PeerConnection");
 
     if (start_call) {
-	pc.addStream(addStream());
+	addStream();
     }
 
     // Start polling
