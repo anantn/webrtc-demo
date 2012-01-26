@@ -98,7 +98,7 @@ var CallingClient = function(username, peer, start_call, config_) {
     };
     var addStream = function() {
 	try {
-	    navigator.webkitGetUserMedia('audio', mediasuccess, mediafailure);
+	    navigator.webkitGetUserMedia("video, audio", mediasuccess, mediafailure);
 	} catch (x) {
 	    console.log("Couldn't get media stream: "+ x);
 	}
