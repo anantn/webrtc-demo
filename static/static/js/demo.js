@@ -108,3 +108,9 @@ var CallingClient = function(username, peer, start_call, config_) {
     poll();
 };
 
+
+config = {
+    stun:'stun.l.google.com:19302'
+};
+
+new CallingClient("abc", "def", true, config);
