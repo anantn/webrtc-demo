@@ -86,6 +86,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	    addStream();
 
 	pc.processSignalingMessage(js.body);
+	setTimeout(poll, poll_timeout);
     };
         
     var poll_error = function(msg) {
@@ -128,6 +129,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 
     var onAddStream = function(ev) {
 	log("onAddStream()");
+	
 	// Set video
 	if (video) {
 	    video.remote.style.opacity = 1;
