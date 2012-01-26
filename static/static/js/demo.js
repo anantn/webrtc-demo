@@ -42,12 +42,13 @@ var ajax = function(params) {
 
 
 var CallingClient = function(username, peer, start_call, config_) {
+    console.log("Calling client constructor");
     var poll_timeout = 1000; // ms
     
     var config = $.extend({}, config_);
 
     if (!config.stun) {
-	alert("Need to provide STUN server");
+	console.log("Need to provide STUN server");
 	return;
     }
 
