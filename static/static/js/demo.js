@@ -107,10 +107,9 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	state = "STARTED";
 
 	// Set video
-	var url = webkitURL.createObjectURL(ev.stream);
 	if (video) {
 	    video.local.style.opacity = 1;
-	    video.local.src = webkitURL.createObjectURL(stream);
+	    video.local.src = webkitURL.createObjectURL(ev.stream);
 	};
     };
 
