@@ -99,9 +99,8 @@ var CallingClient = function(username, peer, start_call, config_) {
 					     console.log("Couldn't create stream");
 					 });
 	} catch (x) {
-	    console.log("Couldn't get media stream');
+	    console.log("Couldn't get media stream");
 	}
-	
     };
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
