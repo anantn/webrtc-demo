@@ -90,7 +90,7 @@ var CallingClient = function(username, peer, start_call, config_) {
     };
 
     var addStream = function() {
-	navigator.webkitGetUserMedia('video', function(stream) {
+	navigator.webkitGetUserMedia('audio', function(stream) {
 					 console.log("Got stream");
 //					 pc.addStream(stream);
 				     },
