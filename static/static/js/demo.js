@@ -101,7 +101,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     };
 
     // Media processing
-    var mediasuccess = function(ev) {
+    var mediasuccess = function(stream) {
 	log("Got stream");
 	pc.addStream(stream);
 	state = "STARTED";
@@ -109,7 +109,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	// Set video
 	if (video) {
 	    video.local.style.opacity = 1;
-	    video.local.src = webkitURL.createObjectURL(ev.stream);
+	    video.local.src = webkitURL.createObjectURL(stream);
 	};
     };
 
@@ -126,13 +126,12 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     };
     
 
-    var onAddStream = function(stream) {
+    var onAddStream = function(ev) {
 	log("onAddStream()");
 	// Set video
-	var url = webkitURL.createObjectURL(stream);
 	if (video) {
 	    video.remote.style.opacity = 1;
-	    video.remote.src = webkitURL.createObjectURL(stream);
+	    video.remote.src = webkitURL.createObjectURL(ev.stream);
 	};
 	
     };
