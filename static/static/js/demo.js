@@ -89,17 +89,18 @@ var CallingClient = function(username, peer, start_call, config_) {
 	     });
     };
 
+    var mediasuccess = function(x) {
+	 console.log("Got stream");
+    };
+
+    var mediafailure = function() {
+	console.log("Couldn't get media");
+    };
     var addStream = function() {
 	try {
-	    navigator.webkitGetUserMedia('audio', function(stream) {
-					     console.log("Got stream");
-					     //					 pc.addStream(stream);
-					 },
-					 function() {
-					     console.log("Couldn't create stream");
-					 });
+	    navigator.webkitGetUserMedia('audio', mediasuccess, mediafailure);
 	} catch (x) {
-	    console.log("Couldn't get media stream");
+	    console.log("Couldn't get media stream: "+ x);
 	}
     };
 
