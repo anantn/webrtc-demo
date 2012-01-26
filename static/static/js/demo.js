@@ -116,4 +116,4 @@ config = {
     stun:'stun.l.google.com:19302'
 };
 
-new CallingClient("abc", "def", false, config);
+//new CallingClient("abc", "def", false, config);
