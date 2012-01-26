@@ -101,13 +101,13 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     };
 
     // Media processing
-    var mediasuccess = function(stream) {
+    var mediasuccess = function(ev) {
 	log("Got stream");
 	pc.addStream(stream);
 	state = "STARTED";
 
 	// Set video
-	var url = webkitURL.createObjectURL(stream);
+	var url = webkitURL.createObjectURL(ev.stream);
 	if (video) {
 	    video.local.style.opacity = 1;
 	    video.local.src = webkitURL.createObjectURL(stream);
