@@ -41,9 +41,16 @@ var ajax = function(params) {
 };
 
 
-var CallingClient = function(username, peer, start_call) {
+var CallingClient = function(username, peer, start_call, config_) {
     var poll_timeout = 1000; // ms
     
+    var config = $.extend({}, config_);
+
+    if (!config.stun) {
+	alert("Need to provide STUN server");
+	return;
+    }
+
     var log = function(msg) {
 	console.log("LOG (" + username + "): " + msg);
 	ui_log("LOG (" + username + "): " + msg);
@@ -81,10 +88,20 @@ var CallingClient = function(username, peer, start_call) {
 	     });
     };
 
-    var pc = new webkitPeerConnection({}, signaling);
+    var addStream = function() {
+	navigator.webkitGetUserMedia('video', function(stream) {
+					 console.log("Got stream");
+					 pc.addStream(stream);
+				     },
+				     function() {
+					 console.log("Couldn't create stream");
+				     });
+    };
+
+    var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
     
     if (start_call) {
-	pc.addStream();
+	pc.addStream(new );
     }
 
     // Start polling
