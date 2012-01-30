@@ -56,7 +56,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 
     var log = function(msg) {
 	console.log("LOG (" + username + "): " + msg);
-//	ui_log("LOG (" + username + "): " + msg);
+	ui_log("LOG (" + username + "): " + msg);
     };
 
     // Signaling methods    
@@ -66,8 +66,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	    body:msg_
 	};
 
-//	log("Sending: " + JSON.stringify(msg));
-	log("Sending");
+	log("Sending: " + JSON.stringify(msg));
 
 	ajax({
 		 url : "/msg/",
@@ -79,8 +78,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 
     var poll_success = function(msg) {
 	var js = JSON.parse(msg);
-//	log("Received message " + JSON.stringify(js));
-	log("Received message");
+	log("Received message " + JSON.stringify(js));
 	
 	if (state == "INIT")
 	    addStream();
@@ -152,6 +150,10 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	log("onRemoveStream()");
     };
     
+    var onStateChange = function() {
+	log("onStateChange()");
+	log("state = " + pc.readyState);
+    }
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
     pc.onaddstream = onAddStream;
@@ -159,6 +161,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     pc.onmessage = onMessage;
     pc.onopen = onOpen;
     pc.onremovestream = onRemoveStream;
+    pc.onstatechange = onStateChange;
 
     console.log("Made PeerConnection");
 
