@@ -18,6 +18,7 @@ app.post('/msg/', function(request, response) {
 
 	     console.log('Send: ' + JSON.stringify(msg));
 	     if (!msg['dest']) {
+		 console.log("User name not specified");
 		 response.send('Must specify user name', 400);
 		 return;
 	     }
