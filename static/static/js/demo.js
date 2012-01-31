@@ -42,7 +42,7 @@ var ajax = function(params) {
 
 
 var CallingClient = function(username, peer, start_call, config_) {
-    console.log("Calling client constructor");
+    console.log("Calling client constructor start_call=" + start_call);
     var poll_timeout = 1000; // ms
     
     var config = $.extend({}, config_);
@@ -97,6 +97,7 @@ var CallingClient = function(username, peer, start_call, config_) {
 	console.log("Couldn't get media");
     };
     var addStream = function() {
+	console.log("Adding a stream");
 	try {
 	    navigator.webkitGetUserMedia("video, audio", mediasuccess, mediafailure);
 	} catch (x) {
