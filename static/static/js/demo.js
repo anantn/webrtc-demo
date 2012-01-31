@@ -42,13 +42,14 @@ var ajax = function(params) {
 
 
 
-var CallingClient = function(config_, username, peer, video_, start_call) {
+var CallingClient = function(config_, username, peer, video_, start_call, ready_cb) {
     console.log("Calling client constructor start_call=" + start_call);
     var poll_timeout = 1000; // ms
     
     var config = $.extend({}, config_);
     var video = $.extend({}, video_);
     var state = "INIT";
+    var localstream = null;
     
     if (!config.stun) {
 	console.log("Need to provide STUN server");
@@ -81,10 +82,16 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	var js = JSON.parse(msg);
 	log("Received message " + JSON.stringify(js));
 	
-	if (state == "INIT")
-	    addStream();
-
+	if (!pc) {
+	    startup();
+	}
+	
 	pc.processSignalingMessage(js.body);
+	
+	if (!stream) {
+	    addStream();
+	}
+	
 	setTimeout(poll, poll_timeout);
     };
         
@@ -103,14 +110,16 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     // Media processing
     var mediasuccess = function(stream) {
 	log("Got stream");
-	pc.addStream(stream);
 	state = "STARTED";
+	localstream = stream;
 
 	// Set video
 	if (video) {
 	    video.local.style.opacity = 1;
 	    video.local.src = webkitURL.createObjectURL(stream);
 	};
+
+	ready_cb();
     };
 
     var mediafailure = function() {
@@ -135,7 +144,6 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	    video.remote.style.opacity = 1;
 	    video.remote.src = webkitURL.createObjectURL(ev.stream);
 	};
-	
     };
 
     var onConnecting = function() {
@@ -157,20 +165,17 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	log("state = " + pc.readyState);
     };
 
-    var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
-    pc.onaddstream = onAddStream;
-    pc.onconnecting = onConnecting;
-    pc.onmessage = onMessage;
-    pc.onopen = onOpen;
-    pc.onremovestream = onRemoveStream;
-    pc.onstatechange = onStateChange;
-
-    console.log("Made PeerConnection");
-
-    if (start_call) {
-	console.log("Adding stream");
-	addStream();
-    }
+    var startup = function() {
+	pc = new webkitPeerConnection("STUN "+config.stun, signaling);
+	pc.onaddstream = onAddStream;
+	pc.onconnecting = onConnecting;
+	pc.onmessage = onMessage;
+	pc.onopen = onOpen;
+	pc.onremovestream = onRemoveStream;
+	pc.onstatechange = onStateChange;
+	
+	console.log("Made PeerConnection");
+    };
 
     // Start polling
     poll();
@@ -184,9 +189,3 @@ default_config = {
 //new CallingClient(config, "abc", "def", video, true);
 
 
-var testtest = function() {
-    var pc = new webkitPeerConnection('STUN stun.l.google.com:19302',
-				      function (x) {
-					 console.log("Signaling output " + x);
-				      });
-};
