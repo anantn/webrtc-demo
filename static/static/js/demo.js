@@ -155,7 +155,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     var onStateChange = function() {
 	log("onStateChange()");
 	log("state = " + pc.readyState);
-    }
+    };
 
     var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
     pc.onaddstream = onAddStream;
@@ -168,6 +168,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     console.log("Made PeerConnection");
 
     if (start_call) {
+	console.log("Adding stream");
 	addStream();
     }
 
