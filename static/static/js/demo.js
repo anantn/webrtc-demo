@@ -185,7 +185,7 @@ default_config = {
 
 
 var testtest = function() {
-    var pc = new webkitPeerConnection('stun.l.google.com:19302',
+    var pc = new webkitPeerConnection('STUN stun.l.google.com:19302',
 				      function (x) {
 					 console.log("Signaling output " + x);
 				      });
