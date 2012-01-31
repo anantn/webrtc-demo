@@ -182,3 +182,11 @@ default_config = {
 };
 
 //new CallingClient(config, "abc", "def", video, true);
+
+
+var testtest = function() {
+    var pc = new webkitPeerConnection('stun.l.google.com:19302',
+				      function (x) {
+					 console.log("Signaling output " + x);
+				      });
+};
