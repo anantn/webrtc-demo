@@ -42,7 +42,7 @@ var ajax = function(params) {
 
 
 
-var CallingClient = function(username, peer, start_call, config_) {
+var CallingClient = function(config_ username, peer, start_call) {
     console.log("Calling client constructor start_call=" + start_call);
     var poll_timeout = 1000; // ms
     
