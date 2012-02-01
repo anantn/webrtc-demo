@@ -42,7 +42,7 @@ var ajax = function(params) {
 
 
 
-var CallingClient = function(config_, username, peer, video_, start_call, ready_cb) {
+var CallingClient = function(config_, username, peer, video_, ready_cb) {
     console.log("Calling client constructor start_call=" + start_call);
     var poll_timeout = 1000; // ms
     
@@ -119,6 +119,7 @@ var CallingClient = function(config_, username, peer, video_, start_call, ready_
 	    video.local.src = webkitURL.createObjectURL(stream);
 	};
 
+	poll();
 	ready_cb();
     };
 
@@ -176,9 +177,6 @@ var CallingClient = function(config_, username, peer, video_, start_call, ready_
 	
 	console.log("Made PeerConnection");
     };
-
-    // Start polling
-    poll();
 };
 
 
