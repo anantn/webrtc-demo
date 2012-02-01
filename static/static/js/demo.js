@@ -138,7 +138,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	
 	// Set video
 	if (video) {
-	    video.remote.style.opacity = 1;
+//	    video.remote.style.opacity = 1;
 	    video.remote.src = webkitURL.createObjectURL(ev.stream);
 	};
     };
