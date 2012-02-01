@@ -48,7 +48,12 @@ overflow:scroll;
        video.local = document.getElementById("localVideo");
        video.remote = document.getElementById("remoteVideo");
 
-       new CallingClient(default_config, me, them, video, start);
+       return new CallingClient(default_config, me, them, video, function(cc) {
+           console.log("Calling client ready");
+           if (start) {
+             cc.startup();
+           }
+         });
      }
    </script>
 
