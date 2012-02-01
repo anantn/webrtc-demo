@@ -49,6 +49,8 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
     var video = $.extend({}, video_);
     var state = "INIT";
     var localstream = null;
+
+    addStream();
     
     if (!config.stun) {
 	console.log("Need to provide STUN server");
@@ -173,6 +175,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	console.log("Made PeerConnection");
     };
 };
+
 
 
 default_config = {
