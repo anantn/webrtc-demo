@@ -44,16 +44,19 @@ overflow:scroll;
    <script>
     function WebRTCDemo(me, them, start) {
        var video = {};
-       
+       var cc;
+
        video.local = document.getElementById("localVideo");
        video.remote = document.getElementById("remoteVideo");
 
-       return new CallingClient(default_config, me, them, video, function(cc) {
+       cc = new CallingClient(default_config, me, them, video, function() {
            console.log("Calling client ready");
            if (start) {
              cc.startup();
            }
          });
+       
+       return cc;
      }
    </script>
 
