@@ -120,7 +120,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	};
 
 	poll();
-	ready_cb();
+	ready_cb(this);
     };
 
     var mediafailure = function() {
