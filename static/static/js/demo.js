@@ -116,7 +116,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	};
 
 	poll();
-	ready_cb(this);
+	ready_cb();
     };
 
     var mediafailure = function() {
@@ -177,6 +177,9 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
     // This is needed
     addStream();
 
+    return {
+	startup:startup
+    };
 };
 
 
