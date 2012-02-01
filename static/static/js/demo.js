@@ -86,11 +86,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	}
 	
 	pc.processSignalingMessage(js.body);
-	
-	if (!stream) {
-	    addStream();
-	}
-	
+
 	setTimeout(poll, poll_timeout);
     };
         
@@ -173,7 +169,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 	pc.onopen = onOpen;
 	pc.onremovestream = onRemoveStream;
 	pc.onstatechange = onStateChange;
-	
+	pc.addStream(localstream);
 	console.log("Made PeerConnection");
     };
 };
