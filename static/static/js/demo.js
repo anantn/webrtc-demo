@@ -44,7 +44,7 @@ var ajax = function(params) {
 
 var CallingClient = function(config_, username, peer, video_, ready_cb) {
     var poll_timeout = 1000; // ms
-    
+    var pc = null;    
     var config = $.extend({}, config_);
     var video = $.extend({}, video_);
     var state = "INIT";
