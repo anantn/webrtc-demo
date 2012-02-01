@@ -111,7 +111,7 @@ var CallingClient = function(config_, username, peer, video_, ready_cb) {
 
 	// Set video
 	if (video) {
-	    video.local.style.opacity = 1;
+//	    video.local.style.opacity = 1;
 	    video.local.src = webkitURL.createObjectURL(stream);
 	};
 
