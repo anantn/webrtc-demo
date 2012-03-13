@@ -41,13 +41,15 @@ var ajax = function(params) {
 };
 
 
-var CallingClient = function(config_, username, peer, video_, start_call) {
-    console.log("Calling client constructor");
-    var poll_timeout = 500; // ms
-    
+
+var CallingClient = function(config_, username, peer, video_, ready_cb) {
+    var poll_timeout = 1000; // ms
+    var pc = null;    
     var config = $.extend({}, config_);
     var video = $.extend({}, video_);
     var state = "INIT";
+    var localstream = null;
+
     
     if (!config.stun) {
 	console.log("Need to provide STUN server");
@@ -80,10 +82,12 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	var js = JSON.parse(msg);
 	log("Received message " + JSON.stringify(js));
 	
-	if (state == "INIT")
-	    addStream();
-
+	if (!pc) {
+	    startup();
+	}
+	
 	pc.processSignalingMessage(js.body);
+
 	setTimeout(poll, poll_timeout);
     };
         
@@ -102,20 +106,24 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     // Media processing
     var mediasuccess = function(stream) {
 	log("Got stream");
-	pc.addStream(stream);
 	state = "STARTED";
+	localstream = stream;
 
 	// Set video
 	if (video) {
-	    video.local.style.opacity = 1;
+//	    video.local.style.opacity = 1;
 	    video.local.src = webkitURL.createObjectURL(stream);
 	};
+
+	poll();
+	ready_cb();
     };
 
     var mediafailure = function() {
 	console.log("Couldn't get media");
     };
     var addStream = function() {
+	console.log("Adding a stream");
 	try {
 	    navigator.webkitGetUserMedia( video ? "video, audio" : "video",
 					  mediasuccess, mediafailure);
@@ -130,10 +138,9 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
 	
 	// Set video
 	if (video) {
-	    video.remote.style.opacity = 1;
+//	    video.remote.style.opacity = 1;
 	    video.remote.src = webkitURL.createObjectURL(ev.stream);
 	};
-	
     };
 
     var onConnecting = function() {
@@ -153,25 +160,28 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     var onStateChange = function() {
 	log("onStateChange()");
 	log("state = " + pc.readyState);
-    }
+    };
 
-    var pc = new webkitPeerConnection("STUN "+config.stun, signaling);
-    pc.onaddstream = onAddStream;
-    pc.onconnecting = onConnecting;
-    pc.onmessage = onMessage;
-    pc.onopen = onOpen;
-    pc.onremovestream = onRemoveStream;
-    pc.onstatechange = onStateChange;
+    var startup = function() {
+	pc = new webkitPeerConnection("STUN "+config.stun, signaling);
+	pc.onaddstream = onAddStream;
+	pc.onconnecting = onConnecting;
+	pc.onmessage = onMessage;
+	pc.onopen = onOpen;
+	pc.onremovestream = onRemoveStream;
+	pc.onstatechange = onStateChange;
+	pc.addStream(localstream);
+	console.log("Made PeerConnection");
+    };
 
-    console.log("Made PeerConnection");
+    // This is needed
+    addStream();
 
-    if (start_call) {
-	addStream();
-    }
-
-    // Start polling
-    poll();
+    return {
+	startup:startup
+    };
 };
+
 
 
 default_config = {
@@ -179,3 +189,5 @@ default_config = {
 };
 
 //new CallingClient(config, "abc", "def", video, true);
+
+
