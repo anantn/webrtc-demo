@@ -1,0 +1,45 @@
+<html>
+<script src="/static/external/jquery-1.6.4.min.js"></script>
+<script src="/static/external/qunit.js"></script>
+<script src="/static/js/mozdemo.js"></script>
+</head>
+<body>
+<h3>Mozilla WebRTC Test</h3>
+
+<style type="text/css">
+  #local {    
+    spacing: 4px;
+    float: left;  
+    width: 50%;
+height: 50%;
+    -webkit-transform: scale(-1, 1);
+  }
+  #remote {
+    spacing: 4px;    
+    float: right;  
+    width: 50%;
+height: 50%;
+  }   
+
+#logwindow{
+height:50%;
+overflow:scroll;
+}
+</style>
+<div id="logwindow">
+</div>
+   <script>
+    var me = "${ me }";
+    var them = "${ them }";
+    var start = ${ start };
+    	          
+    var video = {};
+
+    new CallingClient(default_config, me, them, video, start);
+   </script>
+
+{{if !start}}
+<a href="/mozdemoc/${ them }/${ me }">Call me</A>
+{{/if}}
+</body>
+</html>

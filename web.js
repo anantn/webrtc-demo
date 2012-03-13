@@ -6,11 +6,13 @@ app.use(express.bodyParser());
 app.register('.html',require('jqtpl').express);
 app.set('view options',{layout:false});
 
+var index = 0;
+
 var messages = {
 };
 
 
-var user_re = "([a-z\.]+)";
+var user_re = "([a-z\.0-9]+)";
 
 app.post('/msg/', function(request, response) {
 	     var msg = request.body;
@@ -92,7 +94,31 @@ app.get('/', function(request, response) {
 	    response.render("demo.html", params);
 	});
 
- 
+app.get("/mozdemoa/:user" + user_re + "/:target" + user_re, function(request, response) {
+	    var params = {
+		me: request.params.user,
+		them: request.params.target,
+		start:false
+	    };
+	    
+	    response.render("mozdemo.html", params);
+	});
+
+app.get("/mozdemoc/:user" + user_re + "/:target" + user_re, function(request, response) {
+	    var params = {
+		me: request.params.user,
+		them: request.params.target,
+		start: true
+	    };
+	    
+	    response.render("mozdemo.html", params);
+	});
+
+app.get("/mozdemo", function(request, response) {
+	    var to_uri = "/mozdemoa/" + ++index + "/" + ++index;
+	    
+	    response.redirect(to_uri);
+	});
 
 var port = process.env.PORT || 3000;
 app.listen(port, function() {
