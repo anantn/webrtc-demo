@@ -55,13 +55,13 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     };
 
     log ("Calling client: user=" + username + " peer = " + peer);
-    var webrtc = navigator.webrtcCreateContext(JSON.stringify(config));
+    var webrtc = navigator.getWebrtcContext(JSON.stringify(config));
 
     var poll_success = function(msg) {
 	var js = JSON.parse(msg);
 	log("Received message " + JSON.stringify(js));
 
-	navigator.webrtcProcessMessage(webrtc, js.body);
+	webrtc.processMessage(js.body);
 	setTimeout(poll, poll_timeout);
     };
         
@@ -78,7 +78,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     };
 
     var internal_poll = function() {
-	msg = navigator.webrtcMessagePoll(webrtc);
+	msg = webrtc.messagePoll();
 	
 	if (msg !== "") {
 	    log("Received message from webrtc subsystem");
@@ -105,7 +105,7 @@ var CallingClient = function(config_, username, peer, video_, start_call) {
     
     if (start_call) {
 	log("Making call to " + peer);
-	navigator.webrtcStartCall(webrtc);
+	webrtc.startCall();
     }
     else {
 	log("Waiting for call as " + username);
