@@ -11,35 +11,32 @@
     spacing: 4px;
     float: left;  
     width: 50%;
-height: 50%;
-    -webkit-transform: scale(-1, 1);
+    height: 480px;
   }
   #remote {
     spacing: 4px;    
     float: right;  
     width: 50%;
-height: 50%;
+    height: 480px;
   }   
-
-#logwindow{
-height:50%;
-overflow:scroll;
-}
+  #logwindow{
+    height:50%;
+    overflow:scroll;
+  }
 </style>
-<div id="logwindow">
-</div>
-   <script>
-    var me = "${ me }";
-    var them = "${ them }";
-    var start = ${ start };
-    	          
-    var video = {};
-
-    new CallingClient(default_config, me, them, video, start);
-   </script>
-
+<div id="remote"><canvas id="rview" width="640" height="480"/></div>
+<div id="local"><canvas id="lview" width="640" height="480"/></div>
 {{if !start}}
 <a href="/mozdemoc/${ them }/${ me }">Call me</A>
 {{/if}}
+<div id="logwindow"></div>
+<script>
+  var me = "${ me }";
+  var them = "${ them }";
+  var start = ${ start };
+  
+  var video = document.getElementById("rview").getContext("2d");
+  new CallingClient(default_config, me, them, video, start);
+</script>
 </body>
 </html>
