@@ -38,7 +38,7 @@ var ajax = function (params) {
 };
 
 
-var CallingClient = function(config_, username, peer, video, start_call) {
+var CallingClient = function(config_, username, peer, video, start_call, ip) {
   console.log("Calling client constructor");
   var poll_timeout = 500; // ms
   var config = $.extend({}, config_);
@@ -50,14 +50,21 @@ var CallingClient = function(config_, username, peer, video, start_call) {
   };
 
   log("Calling client: user=" + username + " peer = " + peer);
-  var webrtc = navigator.getWebrtcContext(JSON.stringify(config), function(msg) {
-  	switch (msg) {
-  	case "RINGING":
-  		var answer = confirm("Incoming call! Accept?");
-  		if (answer) webrtc.accept(video);
-  		else webrtc.hangup();
-  		break;
-  	}
+  var webrtc = navigator.getWebrtcContext(JSON.stringify(config), function(msg, arg) {
+    switch (msg) {
+    case "RINGING":
+      var answer = confirm("Incoming call! Accept?");
+      if (answer) webrtc.accept(video);
+      else webrtc.hangup();
+      break;
+    case "IPFOUND":
+      if (!start_call) {
+        var link = document.getElementById("callme");
+        link.href += "/" + arg;
+        link.style.display = "block";
+      }
+      break;
+    }
   });
 
   var poll_success = function(msg) {
@@ -108,7 +115,7 @@ var CallingClient = function(config_, username, peer, video, start_call) {
 
   if (start_call) {
     log("Making call to " + peer);
-    webrtc.startCall("1234", "127.0.0.1");
+    webrtc.startCall("1234", ip);
   } else {
     log("Waiting for call as " + username);
   }

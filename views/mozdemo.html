@@ -27,16 +27,17 @@
 <div id="remote"><canvas id="rview" width="640" height="480"/></div>
 <div id="local"><canvas id="lview" width="640" height="480"/></div>
 {{if !start}}
-<a href="/mozdemoc/${ them }/${ me }">Call me</A>
+<a id="callme" style="display:none;" href="/mozdemoc/${ them }/${ me }">Call me</a>
 {{/if}}
 <div id="logwindow"></div>
 <script>
   var me = "${ me }";
   var them = "${ them }";
   var start = ${ start };
-  
+  var ip = "${ ip }";
+
   var video = document.getElementById("rview").getContext("2d");
-  new CallingClient(default_config, me, them, video, start);
+  new CallingClient(default_config, me, them, video, start, ip);
 </script>
 </body>
 </html>
