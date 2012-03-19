@@ -38,7 +38,7 @@ var ajax = function (params) {
 };
 
 
-var CallingClient = function(config_, username, peer, video, start_call, ip) {
+var CallingClient = function(config_, username, peer, local, remote, start_call, ip) {
   console.log("Calling client constructor");
   var poll_timeout = 500; // ms
   var config = $.extend({}, config_);
@@ -54,7 +54,7 @@ var CallingClient = function(config_, username, peer, video, start_call, ip) {
     switch (msg) {
     case "RINGING":
       var answer = confirm("Incoming call! Accept?");
-      if (answer) webrtc.accept(video);
+      if (answer) webrtc.accept(remote);
       else webrtc.hangup();
       break;
     case "IPFOUND":
@@ -115,7 +115,7 @@ var CallingClient = function(config_, username, peer, video, start_call, ip) {
 
   if (start_call) {
     log("Making call to " + peer);
-    webrtc.startCall("1234", ip);
+    webrtc.startCall("1234", ip, remote);
   } else {
     log("Waiting for call as " + username);
   }

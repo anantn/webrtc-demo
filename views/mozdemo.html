@@ -36,8 +36,9 @@
   var start = ${ start };
   var ip = "${ ip }";
 
-  var video = document.getElementById("rview").getContext("2d");
-  new CallingClient(default_config, me, them, video, start, ip);
+  var local = document.getElementById("lview").getContext("2d");
+  var remote = document.getElementById("rview").getContext("2d");
+  new CallingClient(default_config, me, them, local, remote, start, ip);
 </script>
 </body>
 </html>
