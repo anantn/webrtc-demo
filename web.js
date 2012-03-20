@@ -97,12 +97,11 @@ app.get("/mozdemoa/:user" + user_re + "/:target" + user_re, function(request, re
   response.render("mozdemo.html", params);
 });
 
-app.get("/mozdemoc/:user" + user_re + "/:target" + user_re + "/:ip", function(request, response) {
+app.get("/mozdemoc/:user" + user_re + "/:target" + user_re, function(request, response) {
   var params = {
     me: request.params.user,
     them: request.params.target,
-    start: true,
-    ip: request.params.ip
+    start: true
   };
 
   response.render("mozdemo.html", params);

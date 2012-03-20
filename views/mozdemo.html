@@ -1,44 +1,84 @@
 <html>
-<script src="/static/external/jquery-1.6.4.min.js"></script>
-<script src="/static/external/qunit.js"></script>
-<script src="/static/js/mozdemo.js"></script>
-</head>
-<body>
-<h3>Mozilla WebRTC Test</h3>
 
-<style type="text/css">
-  #local {    
-    spacing: 4px;
+<head>
+  <script src="/static/external/jquery-1.6.4.min.js"></script>
+  <!--<script src="/static/external/qunit.js"></script>-->
+  <script src="/static/js/mozdemo.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy' rel='stylesheet' type='text/css'>
+
+  <style type="text/css">
+  body {
+    font-family: "Sorts Mill Goudy", serif;
+  }
+  #header {
+    font-size: 48px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #callme {
+    font-size: 28px;
+    display: block;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #local {
+    margin-top: 20px;
+    margin-left: 50px;
+    margin-bottom: 50px;
     float: left;  
-    width: 50%;
+    width: 45%;
     height: 480px;
+    border-style: solid;
+    border-width: 2px;
   }
   #remote {
-    spacing: 4px;    
+    margin-top: 20px;
+    margin-right: 50px;
+    margin-bottom: 50px;
     float: right;  
-    width: 50%;
+    width: 45%;
     height: 480px;
-  }   
-  #logwindow{
-    height:50%;
-    overflow:scroll;
+    border-style: solid;
+    border-width: 2px;
   }
-</style>
-<div id="remote"><canvas id="rview" width="640" height="480"/></div>
-<div id="local"><canvas id="lview" width="640" height="480"/></div>
+  #logwindow {
+    width: 80%;
+    height: 20%;
+    padding: 5px;
+    overflow: auto;
+    font-family: "courier";
+    margin-left: auto;
+    margin-right: auto;
+    border-style: dotted;
+    border-width: 1px;
+  }
+  </style>
+</head>
+
+<body>
+
+<div id="header">Mozilla WebRTC Demo</div>
+
 {{if !start}}
-<a id="callme" style="display:none;" href="/mozdemoc/${ them }/${ me }">Call me</a>
+<a id="callme" href="/mozdemoc/${ them }/${ me }">Call me!</a>
 {{/if}}
+
+<div id="remote"><canvas id="rview" width="640" height="480"></canvas><br><p>Remote</p></div>
+<div id="local"><canvas id="lview" width="640" height="480"></canvas><br><p>Local</p></div>
+
 <div id="logwindow"></div>
+
 <script>
   var me = "${ me }";
   var them = "${ them }";
-  var start = ${ start };
-  var ip = "${ ip }";
+  var start = "${ start }";
 
   var local = document.getElementById("lview").getContext("2d");
   var remote = document.getElementById("rview").getContext("2d");
-  new CallingClient(default_config, me, them, local, remote, start, ip);
+  new CallingClient(default_config, me, them, local, remote, start);
 </script>
+
 </body>
 </html>

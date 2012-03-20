@@ -1,8 +1,11 @@
 
 var ui_log = function(msg) {
-  var t = document.createTextNode(msg);
+  var log = "<p>";
+  log += msg.replace("\\r\\n", "<br/>");
+  log += "</p>"
+
   var d = document.createElement("div");
-  $(d).append(t);
+  d.innerHTML = log;
 
   $("#logwindow").append(d);
 };
@@ -37,8 +40,7 @@ var ajax = function (params) {
   }
 };
 
-
-var CallingClient = function(config_, username, peer, local, remote, start_call, ip) {
+var CallingClient = function(config_, username, peer, local, remote, start_call) {
   console.log("Calling client constructor");
   var poll_timeout = 500; // ms
   var config = $.extend({}, config_);
@@ -56,13 +58,6 @@ var CallingClient = function(config_, username, peer, local, remote, start_call,
       var answer = confirm("Incoming call! Accept?");
       if (answer) webrtc.accept(local, remote);
       else webrtc.hangup();
-      break;
-    case "IPFOUND":
-      if (!start_call) {
-        var link = document.getElementById("callme");
-        link.href += "/" + arg;
-        link.style.display = "block";
-      }
       break;
     }
   });
