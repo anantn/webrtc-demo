@@ -54,7 +54,7 @@ var CallingClient = function(config_, username, peer, local, remote, start_call,
     switch (msg) {
     case "RINGING":
       var answer = confirm("Incoming call! Accept?");
-      if (answer) webrtc.accept(remote);
+      if (answer) webrtc.accept(local, remote);
       else webrtc.hangup();
       break;
     case "IPFOUND":
@@ -115,7 +115,7 @@ var CallingClient = function(config_, username, peer, local, remote, start_call,
 
   if (start_call) {
     log("Making call to " + peer);
-    webrtc.startCall("1234", ip, remote);
+    webrtc.startCall("1234", ip, local, remote);
   } else {
     log("Waiting for call as " + username);
   }
