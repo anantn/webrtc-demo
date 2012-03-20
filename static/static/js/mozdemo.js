@@ -108,9 +108,9 @@ var CallingClient = function(config_, username, peer, local, remote, start_call)
     setTimeout(internal_poll, 1000);
   };
 
-  if (start_call) {
+  if (start_call != "false") {
     log("Making call to " + peer);
-    webrtc.startCall("1234", ip, local, remote);
+    webrtc.startCall(local, remote);
   } else {
     log("Waiting for call as " + username);
   }

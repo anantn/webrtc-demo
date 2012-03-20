@@ -91,7 +91,7 @@ app.get("/mozdemoa/:user" + user_re + "/:target" + user_re, function(request, re
   var params = {
     me: request.params.user,
     them: request.params.target,
-    start:false
+    start: false
   };
 
   response.render("mozdemo.html", params);
