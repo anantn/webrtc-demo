@@ -65,9 +65,10 @@
 <a id="callme" href="/mozdemoc/${ them }/${ me }">Call me!</a>
 {{/if}}
 
-<div id="remote"><canvas id="rview" width="640" height="480"></canvas><br><p>Remote</p></div>
-
-<div id="local"><canvas id="lview" width="640" height="480"></canvas><br><p>Local</p></div>
+<div><audio id="localaudio" controls></audio></div><br/>
+<div><audio id="remoteaudio" controls></audio></div><br/>
+<div><video id="localvideo" width="640" height="480" controls></video></div><br/>
+<div><video id="remotevideo" width="640" height="480" controls></video></div><br/>
 
 <div id="logwindow"></div>
 
@@ -76,9 +77,15 @@
   var them = "${ them }";
   var start = "${ start }";
 
-  var local = document.getElementById("lview").getContext("2d");
-  var remote = document.getElementById("rview").getContext("2d");
-  new CallingClient(default_config, me, them, local, remote, start);
+  var divs = {
+    local_video : document.getElementById("localvideo"),
+    remote_video : document.getElementById("remotevideo"),
+    local_audio : document.getElementById("localaudio"),
+    remote_audio : document.getElementById("remoteaudio")
+  };
+
+  console.log(divs);
+  new CallingClient(default_config, me, them, divs, start);
 </script>
 
 </body>
