@@ -29,7 +29,7 @@
     margin-bottom: 50px;
     float: right;  
     width: 640px;
-    height: 480px;
+    height: 700px;
     border-style: solid;
     border-width: 2px;
   }
@@ -39,7 +39,7 @@
     margin-bottom: 50px;
     float: left;  
     width: 640px;
-    height: 480px;
+    height: 700x;
     border-style: solid;
     border-width: 2px;
   }
@@ -65,10 +65,17 @@
 <a id="callme" href="/mozdemoc/${ them }/${ me }">Call me!</a>
 {{/if}}
 
+<div id="local">
+<h1>Local</h1>
 <div><audio id="localaudio" controls></audio></div><br/>
-<div><audio id="remoteaudio" controls></audio></div><br/>
 <div><video id="localvideo" width="640" height="480" controls></video></div><br/>
+</div>
+
+<div id="remote">
+<h1>Remote</h1>
+<div><audio id="remoteaudio" controls></audio></div><br/>
 <div><video id="remotevideo" width="640" height="480" controls></video></div><br/>
+</div>
 
 <div id="logwindow"></div>
 
