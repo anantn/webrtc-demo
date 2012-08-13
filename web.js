@@ -61,7 +61,7 @@ app.get('/msg/:user' + user_re, function(request, response) {
   response.send(JSON.stringify(msg));
 });
 
-app.post('/reset', function(request, response) {
+app.get('/reset', function(request, response) {
   messages = {};
   response.send("OK");
 });

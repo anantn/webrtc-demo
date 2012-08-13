@@ -57,12 +57,27 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
         ui_log("LOG (" + username + "): " + msg);
     };
 
-   
     var poll_success = function(msg) {
         var js = JSON.parse(msg);
+	
         log("Received message " + JSON.stringify(js));
-        
-        webrtc.processMessage(js.body);
+    
+	if (js.body.type == "answer") {
+	    pc.setRemoteDescription(js.body.type,
+				    js.body.sdp,
+				    function() {
+					log("Set remote for " + js.body.type + " succeeded");
+					log("CALL ESTABLISHED!");
+				    }, failure);
+	} else {
+	    pc.setRemoteDescription(js.body.type,
+				    js.body.sdp,
+				    function() {
+					log("Set remote for " + js.body.type + " succeeded");
+					createAnswer(js.body.sdp);
+				    }, failure);
+	}
+
         setTimeout(poll, poll_timeout);
     };
     
@@ -82,27 +97,14 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
         log("ERROR " + x);
     };
 
-    var ready = function() {
-        if (start_call != "false") {
-            log("Making call to " + peer);
-            pc.createOffer(function(offer) {
-                               log("Got offer "+ offer);
-                           });
-        } else {
-            log("Waiting for call as " + username);
-        }
-
-        // Start polling
-        poll();
-    };
 
     // Signaling methods    
-    var gnaling = function(type, body) {
+    var send_sdp = function(type, sdp) {
 	var msg = {
 	    dest:peer,
 	    body: {
                 type : type,
-                body : body
+                sdp : sdp
             }
 	};
 
@@ -116,6 +118,43 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 	     });
     };
 
+
+    var createOffer = function() {
+	pc.createOffer(function(offer) {
+                           log("Got offer "+ offer);
+			   send_sdp('offer', offer);
+			   pc.setLocalDescription("offer", offer,
+						  function() {
+						      log("Set local for offer succeeded");
+						  }, failure);
+                       }, failure);
+    };
+
+    var createAnswer = function(offer) {
+	pc.createAnswer(offer, function(answer) {
+                           log("Got answer "+ answer);
+			   send_sdp('answer', answer);
+			   pc.setLocalDescription("answer", answer,
+						  function() {
+						      log("Set local for answer succeeded");
+						      log("CALL ESTABLISHED!");
+						  }, failure);
+                       }, failure);
+    };
+        
+    var ready = function() {
+        if (start_call != "false") {
+            log("Making call to " + peer);
+	    createOffer();
+        } else {
+            log("Waiting for call as " + username);
+        }
+
+        // Start polling
+        poll();
+    };
+
+    
     log("Calling client: user=" + username + " peer = " + peer);
     var pc = new mozPeerConnection();
     
@@ -126,13 +165,28 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
         log("Failure creating Webrtc object");
     }
 
+
+    // Set callbacks or new media streams
+    pc.onRemoteStreamAdded = function(obj) {
+	log("Got remote stream of type " + obj.type);
+	if (obj.type === "video") {
+	    divs.remote_video.src = obj.stream;
+	    divs.remote_video.play();
+	} else if (obj.type == "audio") {
+	    divs.remote_audio.src = obj.stream;
+	    divs.remote_audio.play();
+	} else {
+	    log("ERROR: Unknown stream type");	    
+	}
+    };
+
     log("Calling get user media");
     // Get the video stream
     navigator.mozGetUserMedia({video:true}, function(stream){
                                   // Attach to the local element
                                   log("Got video stream");
                                   divs.local_video.src = stream;
-                                  divs.local_video_src.play();
+                                  divs.local_video.play();
 
                                   // Add to the PC
                                   video_stream = stream;
@@ -145,14 +199,12 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
                               function() {
                                   log("Could not get video stream");
                               });
-    if (false) {
-        
     // Get the audio stream
     navigator.mozGetUserMedia({audio:true}, function(stream){
                                   log("Got audio stream");
                                   // Attach to the local element
                                   divs.local_audio.src = stream;
-                                  divs.local_audio_src.play();
+                                  divs.local_audio.play();
                                   
                                   // Add to the PC
                                   audio_stream = stream;
@@ -164,7 +216,6 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
                               }, function() {
                                   log("Could not get audio stream");
                               });
-    }
 };
 
 default_config = {
