@@ -1,9 +1,11 @@
 var express = require('express');
+var app = express();
 
-var app = express.createServer(express.logger());
 app.use(express.static(__dirname + '/static'));
 app.use(express.bodyParser());
-app.register('.html',require('jqtpl').express);
+
+var engines = require('consolidate');
+app.engine('html',engines.jqtpl);
 app.set('view options',{layout:false});
 
 var index = 0;
@@ -62,29 +64,6 @@ app.get('/msg/:user' + user_re, function(request, response) {
 app.post('/reset', function(request, response) {
   messages = {};
   response.send("OK");
-});
-
-app.get('/', function(request, response) {
-  var local_src = "/static/js";
-  var svn_src = "http://svn.resiprocate.org/rep/ietf-drafts/fluffy/roap_demo";
-  var params = {
-    peerconnection_src:local_src,
-    test_src:local_src
-  };
-
-  console.log(request.query);
-
-  if (request.query['pc'] === "svn" ){
-    console.log("Using peerconnection from svn");
-    params.peerconnection_src = svn_src;
-  }
-
-  if (request.query['test'] === "svn"){
-    params.test_src = svn_src;    
-  }
-
-  console.log(params);
-  response.render("demo.html", params);
 });
 
 app.get("/mozdemoa/:user" + user_re + "/:target" + user_re, function(request, response) {
