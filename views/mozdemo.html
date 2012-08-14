@@ -11,13 +11,13 @@
     font-family: "Sorts Mill Goudy", serif;
   }
   #header {
-    font-size: 48px;
+    font-size: 32px;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
   }
   #callme {
-    font-size: 28px;
+    font-size: 22px;
     display: block;
     text-align: center;
     margin-left: auto;
@@ -26,26 +26,24 @@
   #local {
     margin-top: 20px;
     margin-left: 30px;
-    margin-bottom: 50px;
     float: right;  
-    width: 640px;
-    height: 700px;
+    width: 320px;
+    height: 350px;
     border-style: solid;
     border-width: 2px;
   }
   #remote {
     margin-top: 20px;
     margin-right: 30px;
-    margin-bottom: 50px;
     float: left;  
-    width: 640px;
-    height: 700x;
+    width: 320px;
+    height: 350px;
     border-style: solid;
     border-width: 2px;
   }
   #logwindow {
-    width: 80%;
-    height: 20%;
+    width: 95%;
+    height: 30%;
     padding: 5px;
     overflow: auto;
     font-family: "courier";
@@ -53,6 +51,12 @@
     margin-right: auto;
     border-style: dotted;
     border-width: 1px;
+  }
+  #localaudio {
+    width: 320px;
+  }
+  #remoteaudio {
+    width: 320px;
   }
   </style>
 </head>
@@ -66,15 +70,19 @@
 {{/if}}
 
 <div id="local">
-<h1>Local</h1>
-<div><audio id="localaudio" controls muted></audio></div><br/>
-<div><video id="localvideo" width="640" height="480" controls></video></div><br/>
+<h2>Local</h1>
+<div>
+  <video id="localvideo" width="320" height="240" controls></video><br/>
+  <audio id="localaudio" controls muted></audio>
+</div><br/>
 </div>
 
 <div id="remote">
-<h1>Remote</h1>
-<div><audio id="remoteaudio" controls></audio></div><br/>
-<div><video id="remotevideo" width="640" height="480" controls></video></div><br/>
+<h2>Remote</h1>
+<div>
+  <video id="remotevideo" width="320" height="240" controls></video><br/>
+  <audio id="remoteaudio" controls></audio>
+</div><br/>
 </div>
 
 <div id="logwindow"></div>
