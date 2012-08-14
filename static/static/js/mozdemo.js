@@ -63,18 +63,16 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
         log("Received message " + JSON.stringify(js));
     
 	if (js.body.type == "answer") {
-	    pc.setRemoteDescription(js.body.type,
-				    js.body.sdp,
+	    pc.setRemoteDescription(js.body,
 				    function() {
 					log("Set remote for " + js.body.type + " succeeded");
 					log("CALL ESTABLISHED!");
 				    }, failure);
 	} else {
-	    pc.setRemoteDescription(js.body.type,
-				    js.body.sdp,
+	    pc.setRemoteDescription(js.body,
 				    function() {
 					log("Set remote for " + js.body.type + " succeeded");
-					createAnswer(js.body.sdp);
+					createAnswer(js.body);
 				    }, failure);
 	}
 
@@ -99,13 +97,10 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 
 
     // Signaling methods    
-    var send_sdp = function(type, sdp) {
+    var send_sdpdescription= function(sdp) {
 	var msg = {
 	    dest:peer,
-	    body: {
-                type : type,
-                sdp : sdp
-            }
+	    body: sdp
 	};
 
 	log("Sending: " + JSON.stringify(msg));
@@ -119,11 +114,16 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
     };
 
 
+    var deobjify = function(x) {
+	return JSON.parse(JSON.stringify(x));
+    };
+
     var createOffer = function() {
 	pc.createOffer(function(offer) {
+			   offer = deobjify(offer);
                            log("Got offer "+ offer);
-			   send_sdp('offer', offer);
-			   pc.setLocalDescription("offer", offer,
+			   send_sdpdescription(offer);
+			   pc.setLocalDescription(offer,
 						  function() {
 						      log("Set local for offer succeeded");
 						  }, failure);
@@ -132,9 +132,10 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 
     var createAnswer = function(offer) {
 	pc.createAnswer(offer, function(answer) {
+			   answer = deobjify(answer);
                            log("Got answer "+ answer);
-			   send_sdp('answer', answer);
-			   pc.setLocalDescription("answer", answer,
+			   send_sdpdescription(answer);
+			   pc.setLocalDescription(answer,
 						  function() {
 						      log("Set local for answer succeeded");
 						      log("CALL ESTABLISHED!");
