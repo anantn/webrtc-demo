@@ -41,6 +41,72 @@ var ajax = function (params) {
 
 
 
+var getUserMedia = undefined;
+var createPeerConnection = undefined;
+var attachStream = undefined;
+var createOfferWrap = undefined;
+var createAnswerWrap = undefined;
+
+// Detect which browser we are on and wire up the functions
+// appropriately
+if (navigator.mozGetUserMedia) {
+    console.log("We seem to be on Firefox");   
+    getUserMedia = function(prefs, success, failure) {
+        navigator.mozGetUserMedia(prefs, success, failure);
+    };
+    createPeerConnection = function() {
+        return new mozPeerConnection();        
+    };
+    attachStream = function(obj, stream) {
+        obj.src = stream;
+        obj.play();
+    };
+    createOfferWrap = function (p, success, failure) {
+      p.createOffer(success, failure);
+    };
+    createAnswerWrap = function (p, offer, success, failure) {
+      p.createAnswer(offer, success, failure);
+    };
+
+} else if(navigator.webkitGetUserMedia) {
+    console.log("This appears to be Chrome");
+    getUserMedia = function(prefs, success, failure) {
+        navigator.webkitGetUserMedia(prefs, success, failure);
+    };
+    createPeerConnection = function() {
+        return new webkitPeerConnection00("STUN stun.l.google.com:19302", 
+                                          function(candidate) {
+                                              log("Got ice candidate " + candidate);
+                                              log("discarding");
+                                          }
+                                         );
+    };
+    attachStream = function(obj, stream) {
+        obj.src = webkitURL.createObjectURL(stream);
+        obj.play();
+    };
+    createOfferWrap = function (p, success, failure) {
+        var offer = p.createOffer({audio:true, video:true});
+        setTimeout(function() {
+                       success({
+                                   type:'offer',
+                                   sdp:offer.toSdp()
+                               });
+                   }, 1);
+    };
+    createAnswerWrap = function (p, offer, success, failure) {
+        var answer = p.createAnswer(offer, {audio:true, video:true});
+        setTimeout(function() {
+                       success({
+                                   type:'answer',
+                                   sdp:answer.toSdp()
+                               });
+                   }, 1);
+    };
+} else {
+    console.log("Can't find any WebRTC implementation");
+}
+
 var CallingClient = function(config_, username, peer, divs, start_call) {
     console.log("Calling client constructor");
     var poll_timeout = 500; // ms
@@ -63,17 +129,28 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
         log("Received message " + JSON.stringify(js));
     
 	if (js.body.type == "answer") {
-	    pc.setRemoteDescription(js.body,
-				    function() {
-					log("Set remote for " + js.body.type + " succeeded");
-					log("CALL ESTABLISHED!");
-				    }, failure);
+            try {
+	        pc.setRemoteDescription(js.body,
+				        function() {
+					    log("Set remote for " + js.body.type + " succeeded");
+					    log("CALL ESTABLISHED!");
+				        }, failure);
+                
+            } catch (x) {
+                log("setRemoteDescription threw an exception " + x);
+                console.log(x);
+            }
 	} else {
-	    pc.setRemoteDescription(js.body,
-				    function() {
-					log("Set remote for " + js.body.type + " succeeded");
-					createAnswer(js.body);
-				    }, failure);
+            try {
+	        pc.setRemoteDescription(js.body,
+				        function() {
+					    log("Set remote for " + js.body.type + " succeeded");
+					    createAnswer(js.body);
+				        }, failure);
+            } catch (x) {
+                log("setRemoteDescription threw an exception " + x);
+                console.log(x);
+            }
 	}
 
         setTimeout(poll, poll_timeout);
@@ -119,28 +196,30 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
     };
 
     var createOffer = function() {
-	pc.createOffer(function(offer) {
-			   offer = deobjify(offer);
-                           log("Got offer "+ offer);
-			   send_sdpdescription(offer);
-			   pc.setLocalDescription(offer,
-						  function() {
-						      log("Set local for offer succeeded");
-						  }, failure);
-                       }, failure);
+        createOfferWrap(pc, 
+	                function(offer) {
+			    offer = deobjify(offer);
+                            log("Got offer "+ offer);
+			    send_sdpdescription(offer);
+			    pc.setLocalDescription(offer,
+						   function() {
+						       log("Set local for offer succeeded");
+						   }, failure);
+                        }, failure);
     };
 
     var createAnswer = function(offer) {
-	pc.createAnswer(offer, function(answer) {
-			   answer = deobjify(answer);
-                           log("Got answer "+ answer);
-			   send_sdpdescription(answer);
-			   pc.setLocalDescription(answer,
-						  function() {
-						      log("Set local for answer succeeded");
-						      log("CALL ESTABLISHED!");
-						  }, failure);
-                       }, failure);
+	createAnswerWrap(pc,
+                         offer, function(answer) {
+			     answer = deobjify(answer);
+                             log("Got answer "+ answer);
+			     send_sdpdescription(answer);
+			     pc.setLocalDescription(answer,
+						    function() {
+						        log("Set local for answer succeeded");
+						        log("CALL ESTABLISHED!");
+						    }, failure);
+                         }, failure);
     };
         
     var ready = function() {
@@ -157,7 +236,7 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 
     
     log("Calling client: user=" + username + " peer = " + peer);
-    var pc = new mozPeerConnection();
+    var pc = createPeerConnection();
     
     if (pc) {
         log("Created Webrtc object");
@@ -171,11 +250,9 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
     pc.onRemoteStreamAdded = function(obj) {
 	log("Got remote stream of type " + obj.type);
 	if (obj.type === "video") {
-	    divs.remote_video.src = obj.stream;
-	    divs.remote_video.play();
+            attachStream(divs.remote_video, obj.stream);
 	} else if (obj.type == "audio") {
-	    divs.remote_audio.src = obj.stream;
-	    divs.remote_audio.play();
+            attachStream(divs.remote_audio, obj.stream);
 	} else {
 	    log("ERROR: Unknown stream type");	    
 	}
@@ -183,40 +260,44 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 
     log("Calling get user media");
     // Get the video stream
-    navigator.mozGetUserMedia({video:true}, function(stream){
-                                  // Attach to the local element
-                                  log("Got video stream");
-                                  divs.local_video.src = stream;
-                                  divs.local_video.play();
+    getUserMedia({video:true}, function(stream){
+                     // Attach to the local element
+                     log("Got video stream");
+                     attachStream(divs.local_video, stream);
 
-                                  // Add to the PC
-                                  video_stream = stream;
-                                  pc.addStream(stream);
-                                  num_streams++;
-                                  if (num_streams == 2) {
-                                      ready();
-                                  }
-                              },
-                              function() {
-                                  log("Could not get video stream");
-                              });
+                     // Add to the PC
+                     video_stream = stream;
+                     pc.addStream(stream);
+                     num_streams++;
+                     
+                     log("Total streams " + num_streams);
+
+                     if (num_streams == 2) {
+                         ready();
+                     }
+                 },
+                 function() {
+                     log("Could not get video stream");
+                 });
     // Get the audio stream
-    navigator.mozGetUserMedia({audio:true}, function(stream){
-                                  log("Got audio stream");
-                                  // Attach to the local element
-                                  divs.local_audio.src = stream;
-                                  divs.local_audio.play();
-                                  
-                                  // Add to the PC
-                                  audio_stream = stream;
-                                  pc.addStream(stream);
-                                  num_streams++;
-                                  if (num_streams == 2) {
-                                      ready();
-                                  }
-                              }, function() {
-                                  log("Could not get audio stream");
-                              });
+    getUserMedia({audio:true}, function(stream){
+                     log("Got audio stream");
+                     // Attach to the local element
+                     attachStream(divs.local_audio, stream);
+
+                     // Add to the PC
+                     audio_stream = stream;
+                     pc.addStream(stream);
+                     num_streams++;
+
+                     log("Total streams " + num_streams);
+
+                     if (num_streams == 2) {
+                         ready();
+                     }
+                 }, function() {
+                     log("Could not get audio stream");
+                 });
 };
 
 default_config = {
