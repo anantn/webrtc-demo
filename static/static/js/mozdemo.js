@@ -67,7 +67,9 @@ if (navigator.mozGetUserMedia) {
     createAnswerWrap = function (p, offer, success, failure) {
       p.createAnswer(offer, success, failure);
     };
-
+    setRemoteWrap = function(p, msg, success, failure) {
+        p.setRemoteDescription(msg, success, failure);
+    };
 } else if(navigator.webkitGetUserMedia) {
     console.log("This appears to be Chrome");
     getUserMedia = function(prefs, success, failure) {
@@ -103,6 +105,13 @@ if (navigator.mozGetUserMedia) {
                                });
                    }, 1);
     };
+    setRemoteWrap = function(p, msg, success, failure) {
+        if (msg.type === "offer") {
+            p.setRemoteDescription(p.SDP_OFFER, new SessionDescription(msg.sdp));
+        } else {
+            p.setRemoteDescription(p.SDP_ANSWER, new SessionDescription(msg.sdp));
+        }
+    };
 } else {
     console.log("Can't find any WebRTC implementation");
 }
@@ -130,23 +139,24 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
     
 	if (js.body.type == "answer") {
             try {
-	        pc.setRemoteDescription(js.body,
-				        function() {
-					    log("Set remote for " + js.body.type + " succeeded");
-					    log("CALL ESTABLISHED!");
-				        }, failure);
-                
+                setRemoteWrap(pc,
+	                      js.body,
+			      function() {
+				  log("Set remote for " + js.body.type + " succeeded");
+				  log("CALL ESTABLISHED!");
+			      }, failure);
             } catch (x) {
                 log("setRemoteDescription threw an exception " + x);
                 console.log(x);
             }
 	} else {
             try {
-	        pc.setRemoteDescription(js.body,
-				        function() {
-					    log("Set remote for " + js.body.type + " succeeded");
-					    createAnswer(js.body);
-				        }, failure);
+                setRemoteWrap(pc,
+	                      js.body,
+			      function() {
+				  log("Set remote for " + js.body.type + " succeeded");
+				  createAnswer(js.body);
+			      }, failure);
             } catch (x) {
                 log("setRemoteDescription threw an exception " + x);
                 console.log(x);
