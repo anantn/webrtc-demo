@@ -91,6 +91,30 @@ app.get("/mozdemo", function(request, response) {
   response.redirect(to_uri);
 });
 
+/* ID Demo. TODO: refactor so this is not duplicated */
+app.get("/mozdemoida/:user" + user_re + "/:target" + user_re, function(request, response) {
+  var params = {
+    me: request.params.user,
+    them: request.params.target,
+    start: false
+  };
+  response.render("mozdemoid.html", params);
+});
+
+app.get("/mozdemoidc/:user" + user_re + "/:target" + user_re, function(request, response) {
+  var params = {
+    me: request.params.user,
+    them: request.params.target,
+    start: true
+  };
+  response.render("mozdemoid.html", params);
+});
+
+app.get("/mozdemoid", function(request, response) {
+  var to_uri = "/mozdemoida/" + ++index + "/" + ++index;
+  response.redirect(to_uri);
+});
+
 var port = process.env.PORT || 3000;
 app.listen(port, function() {
   console.log("Listening on " + port);
