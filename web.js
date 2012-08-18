@@ -115,6 +115,11 @@ app.get("/mozdemoid", function(request, response) {
   response.redirect(to_uri);
 });
 
+app.get("/offer_answer", function(request, response) {
+	    response.render("offer_answer.html", {});
+});
+
+
 var port = process.env.PORT || 3000;
 app.listen(port, function() {
   console.log("Listening on " + port);
