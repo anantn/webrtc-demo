@@ -70,6 +70,9 @@ if (navigator.mozGetUserMedia) {
     setRemoteWrap = function(p, msg, success, failure) {
         p.setRemoteDescription(msg, success, failure);
     };
+    setLocalWrap = function(p, msg, success, failure) {
+        p.setLocalDescription(msg, success, failure);
+    };
 } else if(navigator.webkitGetUserMedia) {
     console.log("This appears to be Chrome");
     getUserMedia = function(prefs, success, failure) {
@@ -78,8 +81,8 @@ if (navigator.mozGetUserMedia) {
     createPeerConnection = function() {
         return new webkitPeerConnection00("STUN stun.l.google.com:19302", 
                                           function(candidate) {
-                                              log("Got ice candidate " + candidate);
-                                              log("discarding");
+                                              console.log("Got ice candidate " + candidate);
+                                              console.log("discarding");
                                           }
                                          );
     };
@@ -97,7 +100,10 @@ if (navigator.mozGetUserMedia) {
                    }, 1);
     };
     createAnswerWrap = function (p, offer, success, failure) {
-        var answer = p.createAnswer(offer, {audio:true, video:true});
+	console.log ("Calling createAnswer with offer= " + offer.sdp);
+
+        var answer = p.createAnswer(offer.sdp,
+				    {audio:true, video:true});
         setTimeout(function() {
                        success({
                                    type:'answer',
@@ -106,11 +112,30 @@ if (navigator.mozGetUserMedia) {
                    }, 1);
     };
     setRemoteWrap = function(p, msg, success, failure) {
-        if (msg.type === "offer") {
-            p.setRemoteDescription(p.SDP_OFFER, new SessionDescription(msg.sdp));
-        } else {
-            p.setRemoteDescription(p.SDP_ANSWER, new SessionDescription(msg.sdp));
-        }
+	try {
+            if (msg.type === "offer") {
+		p.setRemoteDescription(p.SDP_OFFER, new SessionDescription(msg.sdp));
+            } else {
+		p.setRemoteDescription(p.SDP_ANSWER, new SessionDescription(msg.sdp));
+            }
+	} catch (x) {
+	    failure();
+	    return;
+	}
+	success();
+    };
+    setLocalWrap = function(p, msg, success, failure) {
+	try {
+            if (msg.type === "offer") {
+		p.setLocalDescription(p.SDP_OFFER, new SessionDescription(msg.sdp));
+            } else {
+		p.setLocalDescription(p.SDP_ANSWER, new SessionDescription(msg.sdp));
+            }
+	} catch (x) {
+	    failure();
+	    return;
+	}
+	success();
     };
 } else {
     console.log("Can't find any WebRTC implementation");
@@ -155,10 +180,11 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 	                      js.body,
 			      function() {
 				  log("Set remote for " + js.body.type + " succeeded");
+				  log("Calling create answer");
 				  createAnswer(js.body);
 			      }, failure);
             } catch (x) {
-                log("setRemoteDescription threw an exception " + x);
+                log("We threw an exception " + x);
                 console.log(x);
             }
 	}
@@ -183,13 +209,54 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
     };
 
 
-    // Signaling methods    
-    var send_sdpdescription= function(sdp) {
-	var msg = {
-	    dest:peer,
-	    body: sdp
+    var check_feature = function(x) {
+	return $("#" + x).is(":checked");
+    };
+
+    var add_after = function(arr, prefix, toadd) {
+	var narr = [];
+	
+	arr.forEach(function(line) {
+			narr.push(line);
+			if (line.indexOf(prefix) === 0) {
+			    narr.push(toadd);
+			}
+		    });
+	
+	return narr;
+    };
+
+    var modify_description = function(desc_in) {
+	var desc = desc_in.split("\r\n");
+
+	if (check_feature("add_crypto")) {
+	    log("adding crypto line");
+	    desc = add_after(desc, "m=", "a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:KXvY8nSATwMTahhXJmhqWofkNUk4jelbIFzo7YyE");
 	};
 
+	return desc.join("\r\n");
+    };
+
+    // Signaling methods    
+    var send_sdpdescription= function(sdp) {
+	log("Modifying description");
+	
+	var newbody = modify_description(sdp.sdp);
+	
+	log("Modified SDP body = " + newbody);
+
+	var newsdp = {
+	    type:sdp.type,
+	    sdp:newbody
+	};
+
+	var msg = {
+	    dest:peer,
+	    body: newsdp
+	};
+	
+
+	
 	log("Sending: " + JSON.stringify(msg));
 
 	ajax({
@@ -211,10 +278,10 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 			    offer = deobjify(offer);
                             log("Got offer "+ offer);
 			    send_sdpdescription(offer);
-			    pc.setLocalDescription(offer,
-						   function() {
-						       log("Set local for offer succeeded");
-						   }, failure);
+			    setLocalWrap(pc, offer,
+					 function() {
+					     log("Set local for offer succeeded");
+					 }, failure);
                         }, failure);
     };
 
@@ -224,15 +291,17 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
 			     answer = deobjify(answer);
                              log("Got answer "+ answer);
 			     send_sdpdescription(answer);
-			     pc.setLocalDescription(answer,
-						    function() {
-						        log("Set local for answer succeeded");
-						        log("CALL ESTABLISHED!");
-						    }, failure);
+			     setLocalWrap(pc, answer,
+					  function() {
+					      log("Set local for answer succeeded");
+					      log("CALL ESTABLISHED!");
+					  }, failure);
                          }, failure);
     };
         
     var ready = function() {
+	log("start_call=" + start_call);
+
         if (start_call != "false") {
             log("Making call to " + peer);
 	    createOffer();
@@ -308,6 +377,10 @@ var CallingClient = function(config_, username, peer, divs, start_call) {
                  }, function() {
                      log("Could not get audio stream");
                  });
+
+    return {
+    	createOffer : createOffer
+    };
 };
 
 default_config = {

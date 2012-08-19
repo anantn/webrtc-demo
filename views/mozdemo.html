@@ -87,10 +87,15 @@
 
 <div id="logwindow"></div>
 
+<form id="settings" action="">
+      <input type="checkbox" id="add_crypto" name="add_crypto">Add a crypto= line<br/>
+</form>
+
 <script>
   var me = "${ me }";
   var them = "${ them }";
-  var start = "${ start }";
+//  var start = "${ start }";
+  var start = "false";
 
   var divs = {
     local_video : document.getElementById("localvideo"),
@@ -100,8 +105,11 @@
   };
 
   console.log(divs);
-  new CallingClient(default_config, me, them, divs, start);
+  var client = new CallingClient(default_config, me, them, divs, start);
 </script>
 
+<br>
+
+<div><button id="start" onClick="client.createOffer();">Initiate Call</button></div><br/>
 </body>
 </html>
